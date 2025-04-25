@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:my_web_app/core/utilities/app_strings.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -28,7 +29,7 @@ class AboutScreen extends StatelessWidget {
               children: [
                 const CircleAvatar(
                   radius: 60,
-                  backgroundImage: AssetImage('assets/images/profile-pic.png'),
+                  backgroundImage: AssetImage(AppStrings.profile),
                 ),
                 const SizedBox(height: 16),
                 const Text(
@@ -53,7 +54,10 @@ class AboutScreen extends StatelessWidget {
                 const SizedBox(height: 32),
                 const Text(
                   'تعليمي',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
                 const SizedBox(height: 16),
                 Card(
@@ -78,7 +82,10 @@ class AboutScreen extends StatelessWidget {
                 const SizedBox(height: 32),
                 const Text(
                   'رحلتي المهنية',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
                 const SizedBox(height: 16),
                 Card(

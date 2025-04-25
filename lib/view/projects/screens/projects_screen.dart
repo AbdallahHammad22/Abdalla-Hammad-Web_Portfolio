@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:my_web_app/core/utils/const_data.dart';
+import 'package:my_web_app/core/utilities/app_color.dart';
+import 'package:my_web_app/core/utilities/const_data.dart';
 import 'package:my_web_app/view/home/widget/profile_care_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,6 +18,7 @@ class ProjectsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.main,
       appBar: AppBar(
         title: const Text('أعمالي'),
         backgroundColor: Colors.teal,

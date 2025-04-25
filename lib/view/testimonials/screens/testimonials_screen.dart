@@ -1,6 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:my_web_app/core/utils/const_data.dart';
+import 'package:my_web_app/core/utilities/const_data.dart';
 import 'package:my_web_app/view/home/widget/profile_care_widget.dart';
 
 class TestimonialsScreen extends StatelessWidget {
