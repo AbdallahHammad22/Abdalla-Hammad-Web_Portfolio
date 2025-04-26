@@ -9,16 +9,22 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart'; // لعرض IFrame على الويب
-import 'package:my_web_app/core/extensions/assetss_widgets.dart';
 import 'package:my_web_app/core/utilities/app_color.dart';
 import 'package:my_web_app/core/utilities/app_strings.dart';
-import 'package:my_web_app/core/utilities/const_data.dart';
 import 'package:my_web_app/core/utilities/widget/main_button.dart';
 import 'package:my_web_app/core/utilities/widget/main_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> _launchUrl(String url) async {
     final Uri uri = Uri.parse(url);
@@ -28,13 +34,70 @@ class HomeScreen extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+    //   // إظهار Pop-up ترحيبي بعد 3 ثوانٍ
+    //   Future.delayed(const Duration(seconds: 3), () {
+    //     showDialog(
+    //       context: context,
+    //       builder: (context) => AlertDialog(
+    //         title: const Text(
+    //           'هل لديك فكرة تطبيق؟',
+    //           textDirection: TextDirection.rtl,
+    //         ),
+    //         content: const Text(
+    //           'تواصل معي الآن لنحققها معًا!',
+    //           textDirection: TextDirection.rtl,
+    //         ),
+    //         actions: [
+    //           TextButton(
+    //             onPressed: () => Navigator.pop(context),
+    //             child: const Text('إغلاق'),
+    //           ),
+    //           ElevatedButton(
+    //             onPressed: () {
+    //               Navigator.pop(context);
+    //               Navigator.pushNamed(context, '/contact');
+    //             },
+    //             child: const Text('تواصل الآن'),
+    //           ),
+    //         ],
+    //       ),
+    //     );
+    //   });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final isMobile = width < 600;
 
     return Scaffold(
-      appBar: _buildAppBar(context, isMobile),
-      drawer: isMobile ? _buildDrawer(context) : null,
+      key: _scaffoldKey,
+      appBar: _buildAppBar(context, isMobile, _scaffoldKey),
+      drawer: _buildDrawer(context, isMobile),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          _launchUrl('https://wa.link/bvaw3f');
+        },
+        backgroundColor: Colors.teal,
+        icon: const Icon(
+          Icons.message,
+          color: Colors.white,
+        ),
+        label: Text(
+          'تواصل معي الآن',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: isMobile ? 14 : 16,
+            fontWeight: FontWeight.bold,
+          ),
+          textDirection: TextDirection.rtl,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -44,6 +107,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         child: SingleChildScrollView(
+          controller: _scrollController,
           child: Column(
             children: [
               _buildHeroSection(context, isMobile),
@@ -67,81 +131,316 @@ class HomeScreen extends StatelessWidget {
   }
 
   // AppBar
-  AppBar _buildAppBar(BuildContext context, bool isMobile) {
+  AppBar _buildAppBar(BuildContext context, bool isMobile,
+      GlobalKey<ScaffoldState> scaffoldKey) {
+    final currentRoute = ModalRoute.of(context)?.settings.name;
+    final isHomePage = currentRoute == '/home';
+    bool isHovered = false;
+
     return AppBar(
-      backgroundColor: Colors.teal,
+      backgroundColor: Colors.teal.shade600,
       foregroundColor: Colors.white,
-      title: const Text('Abdallah Hammad'),
+      elevation: 2,
+      automaticallyImplyLeading: false,
+      leading: IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: () {
+          scaffoldKey.currentState?.openDrawer();
+        },
+      ),
+      title: StatefulBuilder(
+        builder: (context, setState) {
+          return MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onEnter: (_) {
+              setState(() {
+                isHovered = true;
+              });
+            },
+            onExit: (_) {
+              setState(() {
+                isHovered = false;
+              });
+            },
+            child: GestureDetector(
+              onTap: () {
+                if (isHomePage) {
+                  _scrollController.animateTo(
+                    0,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  );
+                } else {
+                  Navigator.pushNamed(context, '/home');
+                }
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                transform: Matrix4.identity()..scale(isHovered ? 1.05 : 1.0),
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 200),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: isHovered
+                        ? Colors.white.withOpacity(0.8)
+                        : Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                  child: const Text(
+                    'عبدالله حماد',
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
       actions: isMobile
           ? []
           : [
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/home'),
-                child: const Text('الرئيسية', style: TextStyle(color: Colors.white)),
+              _buildAppBarButton(
+                context: context,
+                title: 'الرئيسية',
+                icon: Icons.home,
+                route: '/home',
               ),
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/about'),
-                child: const Text('نبذة عني', style: TextStyle(color: Colors.white)),
+              _buildAppBarButton(
+                context: context,
+                title: 'نبذة عني',
+                icon: Icons.person,
+                route: '/about',
               ),
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/projects'),
-                child: const Text('أعمالي', style: TextStyle(color: Colors.white)),
+              _buildAppBarButton(
+                context: context,
+                title: 'أعمالي',
+                icon: Icons.work,
+                route: '/projects',
               ),
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/services'),
-                child: const Text('الخدمات', style: TextStyle(color: Colors.white)),
+              _buildAppBarButton(
+                context: context,
+                title: 'الخدمات',
+                icon: Icons.build,
+                route: '/services',
               ),
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/testimonials'),
-                child: const Text('آراء العملاء', style: TextStyle(color: Colors.white)),
+              _buildAppBarButton(
+                context: context,
+                title: 'آراء العملاء',
+                icon: Icons.star,
+                route: '/testimonials',
               ),
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/contact'),
-                child: const Text('تواصل معي', style: TextStyle(color: Colors.white)),
+              _buildAppBarButton(
+                context: context,
+                title: 'تواصل معي',
+                icon: Icons.contact_mail,
+                route: '/contact',
               ),
+              const SizedBox(width: 8),
             ],
     );
   }
 
-  // Drawer
-  Drawer _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(color: Colors.teal),
-            child: Text(
-              'عبدالله حماد\nمهندس برمجيات',
-              style: TextStyle(color: Colors.white, fontSize: 24),
-              textDirection: TextDirection.rtl,
+  Widget _buildAppBarButton({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required String route,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: TextButton(
+        onPressed: () {
+          if (ModalRoute.of(context)?.settings.name != route) {
+            Navigator.pushNamed(context, route);
+          }
+        },
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.white70,
+              size: 18,
             ),
+            const SizedBox(width: 6),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Drawer
+  Drawer _buildDrawer(BuildContext context, bool isMobile) {
+    return Drawer(
+      width: isMobile ? null : 350,
+      elevation: 16,
+      child: Container(
+        color: Colors.grey.shade50,
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  DrawerHeader(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.teal, Colors.tealAccent],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircleAvatar(
+                          radius: 40,
+                          backgroundImage: AssetImage(AppStrings.profile),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'عبدالله حماد',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: isMobile ? 22 : 26,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textDirection: TextDirection.rtl,
+                        ),
+                      ],
+                    ),
+                  ),
+                  _buildDrawerItem(
+                    context: context,
+                    title: 'الرئيسية',
+                    icon: Icons.home,
+                    route: '/home',
+                    isMobile: isMobile,
+                  ),
+                  _buildDrawerItem(
+                    context: context,
+                    title: 'نبذة عني',
+                    icon: Icons.person,
+                    route: '/about',
+                    isMobile: isMobile,
+                  ),
+                  _buildDrawerItem(
+                    context: context,
+                    title: 'أعمالي',
+                    icon: Icons.work,
+                    route: '/projects',
+                    isMobile: isMobile,
+                  ),
+                  _buildDrawerItem(
+                    context: context,
+                    title: 'الخدمات',
+                    icon: Icons.build,
+                    route: '/services',
+                    isMobile: isMobile,
+                  ),
+                  _buildDrawerItem(
+                    context: context,
+                    title: 'آراء العملاء',
+                    icon: Icons.star,
+                    route: '/testimonials',
+                    isMobile: isMobile,
+                  ),
+                  _buildDrawerItem(
+                    context: context,
+                    title: 'تواصل معي',
+                    icon: Icons.contact_mail,
+                    route: '/contact',
+                    isMobile: isMobile,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 16 : 24,
+                vertical: isMobile ? 16 : 24,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '© 2025 عبدالله حماد - صمم بكل ',
+                    style: TextStyle(
+                      fontSize: isMobile ? 14 : 16,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textDirection: TextDirection.rtl,
+                  ),
+                  const Icon(
+                    Icons.favorite,
+                    color: Colors.redAccent,
+                    size: 18,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required String route,
+    required bool isMobile,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 16, vertical: 4),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ListTile(
+          leading: Icon(
+            icon,
+            color: Colors.teal,
+            size: isMobile ? 28 : 32,
           ),
-          ListTile(
-            title: const Text('الرئيسية', textDirection: TextDirection.rtl),
-            onTap: () => Navigator.pushNamed(context, '/home'),
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: isMobile ? 18 : 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+            textDirection: TextDirection.rtl,
           ),
-          ListTile(
-            title: const Text('نبذة عني', textDirection: TextDirection.rtl),
-            onTap: () => Navigator.pushNamed(context, '/about'),
+          onTap: () {
+            Navigator.pop(context);
+            if (ModalRoute.of(context)?.settings.name != route) {
+              Navigator.pushNamed(context, route);
+            }
+          },
+          tileColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          ListTile(
-            title: const Text('أعمالي', textDirection: TextDirection.rtl),
-            onTap: () => Navigator.pushNamed(context, '/projects'),
-          ),
-          ListTile(
-            title: const Text('الخدمات', textDirection: TextDirection.rtl),
-            onTap: () => Navigator.pushNamed(context, '/services'),
-          ),
-          ListTile(
-            title: const Text('آراء العملاء', textDirection: TextDirection.rtl),
-            onTap: () => Navigator.pushNamed(context, '/testimonials'),
-          ),
-          ListTile(
-            title: const Text('تواصل معي', textDirection: TextDirection.rtl),
-            onTap: () => Navigator.pushNamed(context, '/contact'),
-          ),
-        ],
+          hoverColor: Colors.teal.withOpacity(0.1),
+          splashColor: Colors.teal.withOpacity(0.3),
+        ),
       ),
     );
   }
@@ -149,65 +448,107 @@ class HomeScreen extends StatelessWidget {
   // Hero Section
   Widget _buildHeroSection(BuildContext context, bool isMobile) {
     return Container(
-      height: isMobile ? 600 : 800,
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: NetworkImage(
-              'https://images.unsplash.com/photo-1516321310762-4794377e6a87?auto=format&fit=crop&w=1920&q=80'),
-          fit: BoxFit.cover,
-          opacity: 0.7,
-        ),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ZoomIn(
-              duration: const Duration(milliseconds: 1000),
-              child: Text(
-                'مرحبًا بكم في عالمي الرقمي',
-                style: TextStyle(
-                  fontSize: isMobile ? 36 : 60,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(
-                      blurRadius: 10,
-                      color: Colors.black.withOpacity(0.5),
-                      offset: const Offset(2, 2),
+      height: isMobile
+          ? MediaQuery.of(context).size.height * 0.6
+          : MediaQuery.of(context).size.height * 0.85,
+      width: double.infinity,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Parallax Effect
+          AnimatedBuilder(
+            animation: _scrollController,
+            builder: (context, child) {
+              double offset = _scrollController.hasClients
+                  ? _scrollController.offset * 0.3
+                  : 0.0;
+              return Transform.translate(
+                offset: Offset(0, offset),
+                child: child,
+              );
+            },
+            child: Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(AppStrings.hero),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            color: Colors.black.withOpacity(0.4),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FadeInDown(
+                duration: const Duration(milliseconds: 200),
+                child: Text(
+                  'حول أفكارك إلى واقع رقمي مذهل!',
+                  style: TextStyle(
+                    fontSize: isMobile ? 25 : 48,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withOpacity(0.3),
+                        offset: const Offset(2, 2),
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.rtl,
+                ),
+              ),
+              const SizedBox(height: 16),
+              FadeInDown(
+                duration: const Duration(milliseconds: 300),
+                delay: const Duration(milliseconds: 200),
+                child: Text(
+                  'مع عبدالله حماد، صمم تطبيقات احترافية تلبي طموحاتك.',
+                  style: TextStyle(
+                    fontSize: isMobile ? 16 : 24,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.rtl,
+                ),
+              ),
+              const SizedBox(height: 32),
+              Pulse(
+                duration: const Duration(milliseconds: 300),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/contact');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 32 : 48,
+                      vertical: isMobile ? 16 : 20,
                     ),
-                  ],
-                ),
-                textDirection: TextDirection.rtl,
-              ),
-            ),
-            const SizedBox(height: 16),
-            FadeInUp(
-              duration: const Duration(milliseconds: 1200),
-              child: Text(
-                'عبدالله حماد - مطور Flutter محترف يحول أفكارك إلى تطبيقات مذهلة',
-                style: TextStyle(
-                  fontSize: isMobile ? 18 : 24,
-                  color: Colors.white70,
-                ),
-                textDirection: TextDirection.rtl,
-              ),
-            ),
-            const SizedBox(height: 32),
-            FadeInUp(
-              duration: const Duration(milliseconds: 1400),
-              child: MainButton(
-                onPressed: () => Navigator.pushNamed(context, '/contact'),
-                verticalPadding: 16,
-                horizontalPadding: 32,
-                child: const MainText.title(
-                  'ابدأ مشروعك الآن',
-                  color: AppColors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    elevation: 8,
+                  ),
+                  child: Text(
+                    'ابدأ مشروعك الآن',
+                    style: TextStyle(
+                      fontSize: isMobile ? 18 : 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                    textDirection: TextDirection.rtl,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -255,13 +596,10 @@ class HomeScreen extends StatelessWidget {
       duration: const Duration(milliseconds: 800),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: CachedNetworkImage(
-          imageUrl:
-              'https://images.unsplash.com/photo-1507238691744-903d9b463188?auto=format&fit=crop&w=800&q=80',
+        child: Image.asset(
+          AppStrings.profile,
           height: isMobile ? 200 : 300,
           fit: BoxFit.cover,
-          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
         ),
       ),
     );
@@ -271,7 +609,8 @@ class HomeScreen extends StatelessWidget {
     return FadeInLeft(
       duration: const Duration(milliseconds: 800),
       child: Column(
-        crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.end,
+        crossAxisAlignment:
+            isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
         children: [
           Text(
             'من أنا؟',
@@ -280,11 +619,12 @@ class HomeScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: Colors.teal,
             ),
-            textDirection: TextDirection.rtl,
           ),
           const SizedBox(height: 16),
           Text(
-            'أنا عبدالله حماد، مطور Flutter بخبرة تزيد عن 3 سنوات. أتخصص في بناء تطبيقات موبايل وويب متجاوبة باستخدام أحدث التقنيات. هدفي هو تقديم حلول رقمية مبتكرة تلبي احتياجات العملاء بتصاميم أنيقة وأداء عالي.',
+            isMobile
+                ? 'أنا عبدالله حماد، مهندس برمجيات متخصص في تطوير البرمجيات باستخدام Flutter. لدي خبرة واسعة في تنفيذ وإطلاق مشاريع متكاملة منشورة على Google Play وApp Store.'
+                : 'أنا عبدالله حماد، مهندس برمجيات متخصص في تطوير البرمجيات باستخدام Flutter. لدي خبرة واسعة في تنفيذ وإطلاق مشاريع متكاملة منشورة على Google Play وApp Store. أتمتع بالقدرة على إدارة دورة حياة المشروع كاملة، بدءًا من الفكرة ووصولًا إلى منتج نهائي متكامل يحقق الأهداف المرجوة ويقدّم حلًا فعّالًا.',
             style: TextStyle(
               fontSize: isMobile ? 16 : 18,
               color: Colors.black87,
@@ -310,12 +650,31 @@ class HomeScreen extends StatelessWidget {
   // Skills Section
   Widget _buildSkillsSection(BuildContext context, bool isMobile) {
     final skills = [
-      Skill(name: 'Flutter', percent: 0.9, icon: 'https://img.icons8.com/color/48/000000/flutter.png'),
-      Skill(name: 'Dart', percent: 0.85, icon: 'https://img.icons8.com/color/48/000000/dart.png'),
-      Skill(name: 'Firebase', percent: 0.75, icon: 'https://img.icons8.com/color/48/000000/firebase.png'),
-      Skill(name: 'UI/UX Design', percent: 0.8, icon: 'https://img.icons8.com/color/48/000000/figma.png'),
-      Skill(name: 'REST API', percent: 0.7, icon: 'https://img.icons8.com/color/48/000000/api.png'),
-      Skill(name: 'Git', percent: 0.85, icon: 'https://img.icons8.com/color/48/000000/git.png'),
+      Skill(
+          name: 'Flutter',
+          percent: 0.9,
+          icon: 'https://img.icons8.com/color/48/000000/flutter.png'),
+      Skill(
+          name: 'Dart',
+          percent: 0.9,
+          icon: 'https://img.icons8.com/color/48/000000/dart.png'),
+      Skill(
+          name: 'REST API',
+          percent: 0.75,
+          icon: 'https://img.icons8.com/color/48/000000/api.png'),
+      Skill(
+          name: 'Project Management',
+          percent: 0.85,
+          icon:
+              'https://img.icons8.com/color/48/000000/project-management.png'),
+      Skill(
+          name: 'Git',
+          percent: 0.9,
+          icon: 'https://img.icons8.com/color/48/000000/git.png'),
+      Skill(
+          name: 'Problem Solving',
+          percent: 0.75,
+          icon: 'https://img.icons8.com/color/48/000000/puzzle.png'),
     ];
 
     return Container(
@@ -323,11 +682,11 @@ class HomeScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 48),
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.teal.withOpacity(0.1),
+        color: Colors.teal,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           FadeInUp(
             duration: const Duration(milliseconds: 800),
@@ -366,9 +725,9 @@ class HomeScreen extends StatelessWidget {
       context: context,
       isMobile: isMobile,
       title: 'لماذا تختار Flutter؟',
-      videoUrl: 'https://www.youtube.com/watch?v=1ukSR1GRtMU',
+      videoUrl: 'https://www.youtube.com/watch?v=5F-6n_2XWR8',
       description:
-          'اكتشف لماذا يعتبر Flutter الخيار الأمثل لتطوير تطبيقات موبايل وويب متجاوبة بسرعة وكفاءة:\n- أداء عالي\n- واجهات مستخدم جذابة\n- دعم متعدد المنصات.',
+          'اكتشف لماذا يعتبر Flutter الخيار الأمثل لتطوير تطبيقات موبايل وويب متجاوبة بسرعة وكفاءة:\n- أداء عالي\n- واجهات مستخدم جذابة\n- دعم متعدد المنصات\n- سهولة التكامل مع الخدمات الخارجية ',
     );
   }
 
@@ -377,10 +736,10 @@ class HomeScreen extends StatelessWidget {
     return _buildVideoSection(
       context: context,
       isMobile: isMobile,
-      title: 'بناء API مع Flutter',
-      videoUrl: 'https://www.youtube.com/watch?v=1ukSR1GRtMU',
+      title: 'أفضل الممارسات لإدارة المشاريع التقنية بكفاءة',
+      videoUrl: 'https://www.youtube.com/watch?v=9LSnINglkQA',
       description:
-          'تعلم كيفية إنشاء ودمج واجهات برمجة التطبيقات (API) في تطبيقات Flutter لتحسين الأداء:\n- تصميم API فعال\n- التكامل مع Backend\n- تحسين الأداء.',
+          'تعلم كيف تدير مشاريعك التقنية باحترافية من خلال أفضل الممارسات :\n- التخطيط الفعال للمشروع\n- استخدام أدوات إدارة المشاريع\n- التعامل مع التحديات الشائعة.',
     );
   }
 
@@ -424,8 +783,7 @@ class HomeScreen extends StatelessWidget {
       ),
       child: isMobile
           ? Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              textDirection: TextDirection.rtl,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildVideoContent(context, controller, isMobile, videoUrl),
                 const SizedBox(height: 24),
@@ -433,26 +791,26 @@ class HomeScreen extends StatelessWidget {
               ],
             )
           : Row(
-              textDirection: TextDirection.rtl,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   flex: 6,
-                  child: _buildVideoContent(context, controller, isMobile, videoUrl),
+                  child: _buildVideoContent(
+                      context, controller, isMobile, videoUrl),
                 ),
                 const SizedBox(width: 32),
                 Expanded(
                   flex: 4,
-                  child: _buildTextContent(context, title, description, isMobile),
+                  child:
+                      _buildTextContent(context, title, description, isMobile),
                 ),
               ],
             ),
     );
   }
 
-  // Video Content (InAppWebView for Web, Player for Mobile)
-  Widget _buildVideoContent(
-      BuildContext context, YoutubePlayerController? controller, bool isMobile, String videoUrl) {
+  Widget _buildVideoContent(BuildContext context,
+      YoutubePlayerController? controller, bool isMobile, String videoUrl) {
     return FadeInUp(
       duration: const Duration(milliseconds: 1200),
       child: Column(
@@ -468,7 +826,8 @@ class HomeScreen extends StatelessWidget {
               height: isMobile ? 200 : 300,
               child: kIsWeb
                   ? _buildWebContent(context, videoUrl, isMobile)
-                  : _buildPlayerContent(context, controller!, isMobile, videoUrl),
+                  : _buildPlayerContent(
+                      context, controller!, isMobile, videoUrl),
             ),
           ),
           if (!kIsWeb) ...[
@@ -491,7 +850,8 @@ class HomeScreen extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -508,10 +868,11 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Web Content using InAppWebView
-  Widget _buildWebContent(BuildContext context, String videoUrl, bool isMobile) {
+  Widget _buildWebContent(
+      BuildContext context, String videoUrl, bool isMobile) {
     final videoId = YoutubePlayer.convertUrlToId(videoUrl) ?? '';
-    final embedUrl = 'https://www.youtube.com/embed/$videoId?controls=1&autoplay=0&rel=0&showinfo=0&fs=1';
+    final embedUrl =
+        'https://www.youtube.com/embed/$videoId?controls=1&autoplay=0&rel=0&showinfo=0&fs=1';
 
     debugPrint('Loading YouTube video for Web: $embedUrl');
 
@@ -533,7 +894,7 @@ class HomeScreen extends StatelessWidget {
       },
       onLoadError: (controller, url, code, message) {
         debugPrint('WebView load error: $code, $message');
-        _launchUrl(videoUrl); // Fallback to browser if loading fails
+        _launchUrl(videoUrl);
       },
       onConsoleMessage: (controller, consoleMessage) {
         debugPrint('WebView console: ${consoleMessage.message}');
@@ -541,9 +902,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Player Content for Mobile
-  Widget _buildPlayerContent(
-      BuildContext context, YoutubePlayerController controller, bool isMobile, String videoUrl) {
+  Widget _buildPlayerContent(BuildContext context,
+      YoutubePlayerController controller, bool isMobile, String videoUrl) {
     debugPrint('Using YouTube player for mobile: $videoUrl');
     return YoutubePlayerBuilder(
       player: YoutubePlayer(
@@ -579,13 +939,15 @@ class HomeScreen extends StatelessWidget {
                 alignment: Alignment.center,
                 children: [
                   CachedNetworkImage(
-                    imageUrl:
-                        YoutubePlayer.getThumbnail(videoId: YoutubePlayer.convertUrlToId(videoUrl) ?? ''),
+                    imageUrl: YoutubePlayer.getThumbnail(
+                        videoId: YoutubePlayer.convertUrlToId(videoUrl) ?? ''),
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: isMobile ? 200 : 300,
-                    placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.white),
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error, color: Colors.white),
                   ),
                   Container(
                     padding: const EdgeInsets.all(8),
@@ -607,13 +969,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Text Content (Title and Description)
   Widget _buildTextContent(
       BuildContext context, String title, String description, bool isMobile) {
     return FadeInUp(
       duration: const Duration(milliseconds: 1000),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         textDirection: TextDirection.rtl,
         children: [
           Text(
@@ -645,25 +1006,27 @@ class HomeScreen extends StatelessWidget {
   Widget _buildProjectsSection(BuildContext context, bool isMobile) {
     final projects = [
       Project(
-        title: 'تطبيق التجارة الإلكترونية',
-        description: 'تطبيق موبايل متكامل للتسوق عبر الإنترنت مع دفع آمن.',
-        image: 'https://images.unsplash.com/photo-1556740738-6bf2b8b9e7b9?auto=format&fit=crop&w=800&q=80',
-        url: 'https://example.com/project1',
+        title: 'DIEAYA | دعاية',
+        description: 'تطبيق تجارة إلكترونية لبيع مستلزمات الديكور والتصاميم.',
+        image: AppStrings.dIEAYA_1,
+        url: 'https://github.com/yourusername/altayeb_store',
         category: 'Mobile',
       ),
       Project(
-        title: 'لوحة تحكم إدارية',
-        description: 'نظام ويب لإدارة الأعمال بسهولة وكفاءة.',
-        image: 'https://images.unsplash.com/photo-1516321310762-4794377e6a87?auto=format&fit=crop&w=800&q=80',
+        title: 'Osool | أصول',
+        description:
+            'تطبيق للعقارات حيث يمكنك شراء العقارات والتحدث للبائع من خلال التطبيق مباشرا.',
+        image: AppStrings.osool_1,
         url: 'https://example.com/project2',
-        category: 'Web',
+        category: 'Mobile',
       ),
       Project(
-        title: 'تطبيق اللياقة',
-        description: 'تطبيق موبايل لتتبع التمارين الرياضية وخطط التغذية.',
-        image: 'https://images.unsplash.com/photo-1517832207067-4db24a2ae47c?auto=format&fit=crop&w=800&q=80',
+        title: 'Admin Panel | لوحة التحكم',
+        description:
+            'لوحة تحكم مميزة تجمع بين الحداثة في المظهر والميزات الكثيرة.',
+        image: AppStrings.adminPanel,
         url: 'https://example.com/project3',
-        category: 'Mobile',
+        category: 'Web',
       ),
     ];
 
@@ -672,11 +1035,11 @@ class HomeScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 48),
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.teal.withOpacity(0.1),
+        color: Colors.teal,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           FadeInUp(
             duration: const Duration(milliseconds: 800),
@@ -687,7 +1050,6 @@ class HomeScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
-              textDirection: TextDirection.rtl,
             ),
           ),
           const SizedBox(height: 24),
@@ -711,12 +1073,13 @@ class HomeScreen extends StatelessWidget {
           FadeInUp(
             duration: const Duration(milliseconds: 1000),
             child: MainButton(
+              color: AppColors.white,
               onPressed: () => Navigator.pushNamed(context, '/projects'),
               verticalPadding: 16,
               horizontalPadding: 32,
               child: const MainText.title(
                 'استعرض جميع الأعمال',
-                color: AppColors.white,
+                color: AppColors.main,
               ),
             ),
           ),
@@ -731,23 +1094,15 @@ class HomeScreen extends StatelessWidget {
       Stat(label: 'مشاريع مكتملة', value: 25),
       Stat(label: 'سنوات الخبرة', value: 3),
       Stat(label: 'عملاء سعداء', value: 15),
-      Stat(label: 'أكواب قهوة', value: 999),
+      Stat(label: 'دول', value: 5),
     ];
 
     return Container(
       constraints: const BoxConstraints(maxWidth: 1200),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 48),
       padding: const EdgeInsets.all(32),
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: NetworkImage(
-              'https://images.unsplash.com/photo-1516321310762-4794377e6a87?auto=format&fit=crop&w=1920&q=80'),
-          fit: BoxFit.cover,
-          opacity: 0.5,
-        ),
-      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           FadeInUp(
             duration: const Duration(milliseconds: 800),
@@ -816,17 +1171,20 @@ class HomeScreen extends StatelessWidget {
       Testimonial(
         name: 'محمد علي',
         comment: 'عبدالله مطور رائع! أنجز مشروعي بسرعة واحترافية.',
-        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+        image:
+            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
       ),
       Testimonial(
         name: 'سارة أحمد',
         comment: 'التطبيق اللي صممه عبدالله فاق توقعاتي، تجربة مستخدم ممتازة!',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+        image:
+            'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
       ),
       Testimonial(
         name: 'خالد محمود',
         comment: 'تعاملت مع عبدالله في مشروع ويب، وكان التنفيذ مثالي.',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+        image:
+            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
       ),
     ];
 
@@ -846,7 +1204,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           FadeInUp(
             duration: const Duration(milliseconds: 800),
@@ -857,13 +1215,12 @@ class HomeScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: Colors.teal,
               ),
-              textDirection: TextDirection.rtl,
             ),
           ),
           const SizedBox(height: 24),
           CarouselSlider(
             options: CarouselOptions(
-              height: isMobile ? 300 : 350,
+              height: isMobile ? 220 : 250,
               autoPlay: true,
               enlargeCenterPage: true,
               viewportFraction: isMobile ? 0.9 : 0.4,
@@ -872,7 +1229,8 @@ class HomeScreen extends StatelessWidget {
             items: testimonials.map((testimonial) {
               return FadeInUp(
                 duration: const Duration(milliseconds: 1000),
-                child: _TestimonialCard(testimonial: testimonial, isMobile: isMobile),
+                child: _TestimonialCard(
+                    testimonial: testimonial, isMobile: isMobile),
               );
             }).toList(),
           ),
@@ -891,7 +1249,7 @@ class HomeScreen extends StatelessWidget {
       ),
       Service(
         title: 'تطوير تطبيقات الويب',
-        description: 'بناء تطبيقات ويب ديناميكية بأداء عالي.',
+        description: 'بناء تطبيقات ويب  بأداء عالي بستخدام Angular,React',
         icon: Icons.web,
       ),
       Service(
@@ -911,11 +1269,11 @@ class HomeScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 48),
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.teal.withOpacity(0.1),
+        color: Colors.teal,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           FadeInUp(
             duration: const Duration(milliseconds: 800),
@@ -947,12 +1305,13 @@ class HomeScreen extends StatelessWidget {
           FadeInUp(
             duration: const Duration(milliseconds: 1000),
             child: MainButton(
+              color: AppColors.white,
               onPressed: () => Navigator.pushNamed(context, '/services'),
               verticalPadding: 16,
               horizontalPadding: 32,
               child: const MainText.title(
                 'استعرض جميع الخدمات',
-                color: AppColors.white,
+                color: AppColors.main,
               ),
             ),
           ),
@@ -965,21 +1324,22 @@ class HomeScreen extends StatelessWidget {
   Widget _buildBlogSection(BuildContext context, bool isMobile) {
     final blogs = [
       Blog(
-        title: 'كيفية بناء تطبيق Flutter متجاوب',
-        excerpt: 'تعلم أفضل الممارسات لتطوير تطبيقات Flutter تدعم جميع الأجهزة.',
-        image: 'https://images.unsplash.com/photo-1516321310762-4794377e6a87?auto=format&fit=crop&w=800&q=80',
+        title: 'هل مشروعك البرمجي جاهز للنمو أم أنه سيواجه التحديات قريبًا؟',
+        excerpt:
+            'اكتشف كيف تتأكد من جاهزية مشروعك للتوسع وتجنب التحديات المستقبلية.',
+        image: AppStrings.articl_1,
         url: 'https://example.com/blog1',
       ),
       Blog(
-        title: 'مقدمة عن Firebase للمبتدئين',
-        excerpt: 'اكتشف كيف يمكن لـ Firebase تسريع تطوير تطبيقاتك.',
-        image: 'https://images.unsplash.com/photo-1517832207067-4db24a2ae47c?auto=format&fit=crop&w=800&q=80',
+        title: 'كيف تصيغ متطلبات مشروعك البرمجي بشكل صحيح لضمان تنفيذ دقيق؟',
+        excerpt: 'تعلم كيفية كتابة متطلبات واضحة تضمن نجاح تنفيذ مشروعك.',
+        image: AppStrings.articl_2,
         url: 'https://example.com/blog2',
       ),
       Blog(
-        title: 'أفضل أدوات تصميم UI/UX لعام 2025',
-        excerpt: 'استعراض لأحدث أدوات تصميم واجهات المستخدم.',
-        image: 'https://images.unsplash.com/photo-1556740738-6bf2b8b9e7b9?auto=format&fit=crop&w=800&q=80',
+        title: 'التطبيقات: أداة أساسية لتوسيع نشاطك وزيادة مبيعاتك!',
+        excerpt: 'اعرف كيف تساعد التطبيقات في تنمية أعمالك وتعزيز مبيعاتك.',
+        image: AppStrings.articl_3,
         url: 'https://example.com/blog3',
       ),
     ];
@@ -1000,7 +1360,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           FadeInUp(
             duration: const Duration(milliseconds: 800),
@@ -1038,7 +1398,8 @@ class HomeScreen extends StatelessWidget {
     final faqs = [
       Faq(
         question: 'ما هي مدة تطوير تطبيق موبايل؟',
-        answer: 'تعتمد المدة على تعقيد التطبيق، لكن متوسط التطبيقات يستغرق من 2 إلى 6 أشهر.',
+        answer:
+            'تعتمد المدة على تعقيد التطبيق، لكن متوسط التطبيقات يستغرق من 2 إلى 6 أشهر.',
       ),
       Faq(
         question: 'هل تقدم دعمًا بعد التطوير؟',
@@ -1055,81 +1416,91 @@ class HomeScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 48),
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.teal.withOpacity(0.1),
+        color: Colors.teal,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          FadeInUp(
-            duration: const Duration(milliseconds: 800),
-            child: Text(
-              'الأسئلة الشائعة',
-              style: TextStyle(
-                fontSize: isMobile ? 28 : 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FadeInUp(
+              duration: const Duration(milliseconds: 800),
+              child: Text(
+                'الأسئلة الشائعة',
+                style: TextStyle(
+                  fontSize: isMobile ? 28 : 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textDirection: TextDirection.rtl,
+                textAlign: TextAlign.right,
               ),
-              textDirection: TextDirection.rtl,
             ),
-          ),
-          const SizedBox(height: 24),
-          ...faqs.asMap().entries.map((entry) {
-            final index = entry.key;
-            final faq = entry.value;
-            return FadeInUp(
-              duration: Duration(milliseconds: 800 + index * 200),
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ExpandablePanel(
-                  theme: const ExpandableThemeData(
-                    headerAlignment: ExpandablePanelHeaderAlignment.center,
-                    tapBodyToCollapse: true,
-                    tapBodyToExpand: true,
-                    hasIcon: true,
-                    iconColor: Colors.teal,
-                  ),
-                  header: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      faq.question,
-                      style: TextStyle(
-                        fontSize: isMobile ? 18 : 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.teal,
+            const SizedBox(height: 24),
+            ...faqs.asMap().entries.map((entry) {
+              final index = entry.key;
+              final faq = entry.value;
+              return FadeInUp(
+                duration: Duration(milliseconds: 800 + index * 200),
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
                       ),
-                      textDirection: TextDirection.rtl,
-                    ),
+                    ],
                   ),
-                  collapsed: const SizedBox.shrink(),
-                  expanded: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      faq.answer,
-                      style: TextStyle(
-                        fontSize: isMobile ? 16 : 18,
-                        color: Colors.black87,
+                  child: ExpandablePanel(
+                    theme: const ExpandableThemeData(
+                      headerAlignment: ExpandablePanelHeaderAlignment.center,
+                      tapBodyToCollapse: true,
+                      tapBodyToExpand: true,
+                      hasIcon: true,
+                      iconColor: Colors.teal,
+                    ),
+                    header: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        faq.question,
+                        style: TextStyle(
+                          fontSize: isMobile ? 18 : 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.teal,
+                        ),
+                        textDirection: TextDirection.rtl,
+                        textAlign: TextAlign.right,
                       ),
-                      textDirection: TextDirection.rtl,
-                      textAlign: TextAlign.right,
+                    ),
+                    collapsed: const SizedBox.shrink(),
+                    expanded: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            faq.answer,
+                            style: TextStyle(
+                              fontSize: isMobile ? 16 : 18,
+                              color: Colors.black87,
+                            ),
+                            textDirection: TextDirection.rtl,
+                            textAlign: TextAlign.right,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          }),
-        ],
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
@@ -1169,7 +1540,8 @@ class HomeScreen extends StatelessWidget {
     return FadeInLeft(
       duration: const Duration(milliseconds: 800),
       child: Column(
-        crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.end,
+        crossAxisAlignment:
+            isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
         children: [
           Text(
             'تواصل معي الآن',
@@ -1196,7 +1568,8 @@ class HomeScreen extends StatelessWidget {
               labelText: 'الاسم',
               filled: true,
               fillColor: Colors.white,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
             textDirection: TextDirection.rtl,
           ),
@@ -1206,7 +1579,8 @@ class HomeScreen extends StatelessWidget {
               labelText: 'البريد الإلكتروني',
               filled: true,
               fillColor: Colors.white,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
             textDirection: TextDirection.rtl,
           ),
@@ -1216,26 +1590,27 @@ class HomeScreen extends StatelessWidget {
               labelText: 'رسالتك',
               filled: true,
               fillColor: Colors.white,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
             maxLines: 4,
             textDirection: TextDirection.rtl,
           ),
           const SizedBox(height: 24),
           MainButton(
-            onPressed: () {
-              // Implement form submission logic
-            },
+            color: AppColors.white,
+            onPressed: () {},
             verticalPadding: 16,
             horizontalPadding: 32,
             child: const MainText.title(
               'إرسال الرسالة',
-              color: AppColors.white,
+              color: AppColors.main,
             ),
           ),
           const SizedBox(height: 24),
           Row(
-            mainAxisAlignment: isMobile ? MainAxisAlignment.center : MainAxisAlignment.end,
+            mainAxisAlignment:
+                isMobile ? MainAxisAlignment.center : MainAxisAlignment.end,
             textDirection: TextDirection.rtl,
             children: [
               ElasticIn(
@@ -1293,13 +1668,10 @@ class HomeScreen extends StatelessWidget {
       duration: const Duration(milliseconds: 800),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: CachedNetworkImage(
-          imageUrl:
-              'https://images.unsplash.com/photo-1516321310762-4794377e6a87?auto=format&fit=crop&w=800&q=80',
+        child: Image.asset(
+          AppStrings.profile,
           height: isMobile ? 200 : 300,
           fit: BoxFit.cover,
-          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
         ),
       ),
     );
@@ -1328,22 +1700,26 @@ class HomeScreen extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, '/home'),
-                child: const Text('الرئيسية', style: TextStyle(color: Colors.white70)),
+                child: const Text('الرئيسية',
+                    style: TextStyle(color: Colors.white70)),
               ),
               const SizedBox(width: 16),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, '/about'),
-                child: const Text('نبذة عني', style: TextStyle(color: Colors.white70)),
+                child: const Text('نبذة عني',
+                    style: TextStyle(color: Colors.white70)),
               ),
               const SizedBox(width: 16),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, '/projects'),
-                child: const Text('أعمالي', style: TextStyle(color: Colors.white70)),
+                child: const Text('أعمالي',
+                    style: TextStyle(color: Colors.white70)),
               ),
               const SizedBox(width: 16),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, '/services'),
-                child: const Text('الخدمات', style: TextStyle(color: Colors.white70)),
+                child: const Text('الخدمات',
+                    style: TextStyle(color: Colors.white70)),
               ),
             ],
           ),
@@ -1416,7 +1792,11 @@ class Blog {
   final String image;
   final String url;
 
-  Blog({required this.title, required this.excerpt, required this.image, required this.url});
+  Blog(
+      {required this.title,
+      required this.excerpt,
+      required this.image,
+      required this.url});
 }
 
 class Faq {
@@ -1524,24 +1904,25 @@ class _ProjectCardState extends State<_ProjectCard> {
             ],
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            textDirection: TextDirection.rtl,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(12)),
                 child: CachedNetworkImage(
                   imageUrl: widget.project.image,
                   height: 150,
                   fit: BoxFit.cover,
                   width: double.infinity,
-                  placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       widget.project.title,
@@ -1550,7 +1931,6 @@ class _ProjectCardState extends State<_ProjectCard> {
                         fontWeight: FontWeight.bold,
                         color: Colors.teal,
                       ),
-                      textDirection: TextDirection.rtl,
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -1559,7 +1939,6 @@ class _ProjectCardState extends State<_ProjectCard> {
                         fontSize: 16,
                         color: Colors.black87,
                       ),
-                      textDirection: TextDirection.rtl,
                       textAlign: TextAlign.right,
                     ),
                     const SizedBox(height: 8),
@@ -1569,7 +1948,6 @@ class _ProjectCardState extends State<_ProjectCard> {
                         fontSize: 14,
                         color: Colors.grey,
                       ),
-                      textDirection: TextDirection.rtl,
                     ),
                   ],
                 ),
@@ -1605,8 +1983,7 @@ class _TestimonialCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        textDirection: TextDirection.rtl,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(50),
@@ -1636,7 +2013,6 @@ class _TestimonialCard extends StatelessWidget {
               fontSize: 16,
               color: Colors.black87,
             ),
-            textDirection: TextDirection.rtl,
             textAlign: TextAlign.right,
           ),
         ],
@@ -1667,8 +2043,7 @@ class _ServiceCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        textDirection: TextDirection.rtl,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
             service.icon,
@@ -1683,7 +2058,6 @@ class _ServiceCard extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: Colors.teal,
             ),
-            textDirection: TextDirection.rtl,
           ),
           const SizedBox(height: 8),
           Text(
@@ -1692,7 +2066,6 @@ class _ServiceCard extends StatelessWidget {
               fontSize: 16,
               color: Colors.black87,
             ),
-            textDirection: TextDirection.rtl,
             textAlign: TextAlign.right,
           ),
         ],
@@ -1722,8 +2095,7 @@ class _BlogCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        textDirection: TextDirection.rtl,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
@@ -1732,14 +2104,15 @@ class _BlogCard extends StatelessWidget {
               height: 150,
               fit: BoxFit.cover,
               width: double.infinity,
-              placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+              placeholder: (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
               errorWidget: (context, url, error) => const Icon(Icons.error),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   blog.title,
@@ -1748,7 +2121,6 @@ class _BlogCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: Colors.teal,
                   ),
-                  textDirection: TextDirection.rtl,
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -1757,7 +2129,6 @@ class _BlogCard extends StatelessWidget {
                     fontSize: 16,
                     color: Colors.black87,
                   ),
-                  textDirection: TextDirection.rtl,
                   textAlign: TextAlign.right,
                 ),
                 const SizedBox(height: 16),
@@ -1780,7 +2151,6 @@ class _BlogCard extends StatelessWidget {
   }
 }
 
-// Social Icon Widget
 class _SocialIcon extends StatefulWidget {
   final String asset;
   final String url;

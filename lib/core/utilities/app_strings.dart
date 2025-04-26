@@ -2,6 +2,12 @@ class AppStrings {
   AppStrings._();
   //? Images .........................................................
   static const String profile = "assets/images/profile-pic.png";
+  static const String hero = "assets/images/hero.jpg";
+  //? articl images ...................................................
+  static const String articl_1 = "assets/images/articl_1.png";
+  static const String articl_2 = "assets/images/articl_2.png";
+  static const String articl_3 = "assets/images/articl_3.png";
+
   //? Projects Images .................................................
   static const String dIEAYA_1 = "assets/images/DIEAYA_1.png";
   static const String aldawa_1 = "assets/images/Aldawa_1.png";
