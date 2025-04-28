@@ -35,31 +35,4 @@ const List<Map<String, String>> projects = [
   },
 ];
 
-const List<Map<String, String>> services = [
-  {
-    'title': 'تطوير تطبيقات الموبايل',
-    'description': 'تصميم وتطوير تطبيقات Android وiOS باستخدام Flutter.',
-  },
-  {
-    'title': 'تطوير تطبيقات الويب',
-    'description': 'بناء تطبيقات ويب متجاوبة باستخدام Flutter Web.',
-  },
-  {
-    'title': 'تكامل Firebase',
-    'description': 'إعداد قواعد بيانات ومصادقة باستخدام Firebase.',
-  },
-];
 
-const List<Map<String, String>> testimonials = [
-  {
-    'name': 'عميل 1',
-    'feedback': 'عبدالله قدم تطبيقًا رائعًا بتصميم احترافي وأداء ممتاز!',
-    'image': 'assets/images/client1.png',
-  },
-  {
-    'name': 'عميل 2',
-    'feedback':
-        'تعاملت مع عبدالله في مشروع ويب، وكان متميزًا في التسليم بالوقت!',
-    'image': 'assets/images/client2.png',
-  },
-];

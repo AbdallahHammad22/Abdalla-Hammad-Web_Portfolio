@@ -834,7 +834,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                if (controller!.value.isReady) {
+                if (controller.value.isReady) {
                   if (controller.value.isPlaying) {
                     controller.pause();
                     debugPrint('Video Paused');
@@ -1091,7 +1091,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Stats Section
   Widget _buildStatsSection(BuildContext context, bool isMobile) {
     final stats = [
-      Stat(label: 'مشاريع مكتملة', value: 25),
+      Stat(label: 'مشاريع مكتملة', value: 20),
       Stat(label: 'سنوات الخبرة', value: 3),
       Stat(label: 'عملاء سعداء', value: 15),
       Stat(label: 'دول', value: 5),
