@@ -3,9 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="$FLUTTER_BASE_HREF">
   <title>Abdallah Hammad's Portfolio</title>
   <meta name="description" content="Portfolio of Abdallah Hammad, a Flutter developer showcasing mobile and web projects.">
+  <meta name="keywords" content="Flutter developer, Abdallah Hammad, mobile apps, web development, portfolio">
+  <meta name="author" content="Abdallah Hammad">
   <link rel="icon" href="/favicon.png" type="image/png">
+  <!-- تحسين التوافق مع GitHub Pages -->
+  <script>
+    // حل مشكلة الـ 404 للروابط الفرعية (Client-Side Routing)
+    if (window.location.pathname !== '/' && !window.location.pathname.endsWith('.html')) {
+      history.pushState({}, '', '/');
+    }
+  </script>
 </head>
 <body>
   <script src="main.dart.js" type="application/javascript"></script>

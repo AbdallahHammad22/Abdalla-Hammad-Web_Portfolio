@@ -507,7 +507,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 duration: const Duration(milliseconds: 300),
                 delay: const Duration(milliseconds: 200),
                 child: Text(
-                  'مع عبدالله حماد، صمم تطبيقات احترافية تلبي طموحاتك.',
+                  'مع عبدالله حماد، صمم تطبيقات احترافية تلبي طموحاتك',
                   style: TextStyle(
                     fontSize: isMobile ? 16 : 24,
                     color: Colors.white70,
@@ -623,8 +623,8 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 16),
           Text(
             isMobile
-                ? 'أنا عبدالله حماد، مهندس برمجيات متخصص في تطوير البرمجيات باستخدام Flutter. لدي خبرة واسعة في تنفيذ وإطلاق مشاريع متكاملة منشورة على Google Play وApp Store.'
-                : 'أنا عبدالله حماد، مهندس برمجيات متخصص في تطوير البرمجيات باستخدام Flutter. لدي خبرة واسعة في تنفيذ وإطلاق مشاريع متكاملة منشورة على Google Play وApp Store. أتمتع بالقدرة على إدارة دورة حياة المشروع كاملة، بدءًا من الفكرة ووصولًا إلى منتج نهائي متكامل يحقق الأهداف المرجوة ويقدّم حلًا فعّالًا.',
+                ? 'أنا عبدالله حماد، مهندس برمجيات متخصص في تطوير البرمجيات باستخدام Flutter. لدي خبرة واسعة في تنفيذ وإطلاق مشاريع متكاملة منشورة على Google Play , App Store'
+                : 'أنا عبدالله حماد، مهندس برمجيات متخصص في تطوير البرمجيات باستخدام Flutter. لدي خبرة واسعة في تنفيذ وإطلاق مشاريع متكاملة منشورة على Google Play , App Store أتمتع بالقدرة على إدارة دورة حياة المشروع كاملة، بدءًا من الفكرة ووصولًا إلى منتج نهائي متكامل يحقق الأهداف المرجوة ويقدّم حلًا فعّالًا',
             style: TextStyle(
               fontSize: isMobile ? 16 : 18,
               color: Colors.black87,
@@ -727,7 +727,7 @@ class _HomeScreenState extends State<HomeScreen> {
       title: 'لماذا تختار Flutter؟',
       videoUrl: 'https://www.youtube.com/watch?v=5F-6n_2XWR8',
       description:
-          'اكتشف لماذا يعتبر Flutter الخيار الأمثل لتطوير تطبيقات موبايل وويب متجاوبة بسرعة وكفاءة:\n- أداء عالي\n- واجهات مستخدم جذابة\n- دعم متعدد المنصات\n- سهولة التكامل مع الخدمات الخارجية ',
+          'اكتشف لماذا يعتبر Flutter الخيار الأمثل لتطوير تطبيقات موبايل متجاوبة بسرعة وكفاءة :\n- أداء عالي\n- واجهات مستخدم جذابة\n- دعم متعدد المنصات android , ios \n- سهولة التكامل مع الخدمات الخارجية ',
     );
   }
 
@@ -1009,7 +1009,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: 'DIEAYA | دعاية',
         description: 'تطبيق تجارة إلكترونية لبيع مستلزمات الديكور والتصاميم.',
         image: AppStrings.dIEAYA_1,
-        url: 'https://github.com/yourusername/altayeb_store',
+        url: 'https://play.google.com/store/apps/details?id=com.digiplus.printing',
         category: 'Mobile',
       ),
       Project(
@@ -1017,7 +1017,7 @@ class _HomeScreenState extends State<HomeScreen> {
         description:
             'تطبيق للعقارات حيث يمكنك شراء العقارات والتحدث للبائع من خلال التطبيق مباشرا.',
         image: AppStrings.osool_1,
-        url: 'https://example.com/project2',
+        url: 'https://github.com/AbdallahHammad22',
         category: 'Mobile',
       ),
       Project(
@@ -1025,7 +1025,7 @@ class _HomeScreenState extends State<HomeScreen> {
         description:
             'لوحة تحكم مميزة تجمع بين الحداثة في المظهر والميزات الكثيرة.',
         image: AppStrings.adminPanel,
-        url: 'https://example.com/project3',
+        url: 'https://github.com/AbdallahHammad22',
         category: 'Web',
       ),
     ];
@@ -1091,9 +1091,9 @@ class _HomeScreenState extends State<HomeScreen> {
   // Stats Section
   Widget _buildStatsSection(BuildContext context, bool isMobile) {
     final stats = [
-      Stat(label: 'مشاريع مكتملة', value: 20),
+      Stat(label: 'مشاريع مكتملة', value: 14),
       Stat(label: 'سنوات الخبرة', value: 3),
-      Stat(label: 'عملاء سعداء', value: 15),
+      Stat(label: 'عملاء سعداء', value: 9),
       Stat(label: 'دول', value: 5),
     ];
 
@@ -1169,22 +1169,22 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildTestimonialsSection(BuildContext context, bool isMobile) {
     final testimonials = [
       Testimonial(
-        name: 'محمد علي',
-        comment: 'عبدالله مطور رائع! أنجز مشروعي بسرعة واحترافية.',
-        image:
-            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+        name: 'دعاية | DIEAYA',
+        comment:
+            'تم تنفيذ تطبيق يلبي خدمات شركتي لتقديم خدمات التصميم من قبل المهندس عبدالله حماد والتيم التقني المتميز ',
+        image: AppStrings.dieayaicon,
       ),
       Testimonial(
-        name: 'سارة أحمد',
-        comment: 'التطبيق اللي صممه عبدالله فاق توقعاتي، تجربة مستخدم ممتازة!',
-        image:
-            'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+        name: 'السوق العربي',
+        comment:
+            'تم تنفيذ تطبيق السوق العربي لتسهيل عمليه البيع والشراء الالكتروني داخل الاردن واتوجه له بالشكر على الاداء الرائع ',
+        image: AppStrings.arabicon,
       ),
       Testimonial(
-        name: 'خالد محمود',
-        comment: 'تعاملت مع عبدالله في مشروع ويب، وكان التنفيذ مثالي.',
-        image:
-            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+        name: 'توب تن',
+        comment:
+            'تم تلبية احتياج شركتي في انشاء تطبيق يعرض منتجات الشركه من ملابس ومستحضرات تجميل ويرجع الفضل للمهندس عبدالله والتيم التقني المميز',
+        image: AppStrings.tobtenicon,
       ),
     ];
 
@@ -1328,19 +1328,19 @@ class _HomeScreenState extends State<HomeScreen> {
         excerpt:
             'اكتشف كيف تتأكد من جاهزية مشروعك للتوسع وتجنب التحديات المستقبلية.',
         image: AppStrings.articl_1,
-        url: 'https://example.com/blog1',
+        url: 'https://www.facebook.com/share/p/1AfoT99V5K/',
       ),
       Blog(
         title: 'كيف تصيغ متطلبات مشروعك البرمجي بشكل صحيح لضمان تنفيذ دقيق؟',
         excerpt: 'تعلم كيفية كتابة متطلبات واضحة تضمن نجاح تنفيذ مشروعك.',
         image: AppStrings.articl_2,
-        url: 'https://example.com/blog2',
+        url: 'https://www.facebook.com/share/p/19Fyr4UMKQ/',
       ),
       Blog(
         title: 'التطبيقات: أداة أساسية لتوسيع نشاطك وزيادة مبيعاتك!',
         excerpt: 'اعرف كيف تساعد التطبيقات في تنمية أعمالك وتعزيز مبيعاتك.',
         image: AppStrings.articl_3,
-        url: 'https://example.com/blog3',
+        url: 'https://www.facebook.com/share/p/19ttR26v8v/',
       ),
     ];
 
@@ -1399,14 +1399,14 @@ class _HomeScreenState extends State<HomeScreen> {
       Faq(
         question: 'ما هي مدة تطوير تطبيق موبايل؟',
         answer:
-            'تعتمد المدة على تعقيد التطبيق، لكن متوسط التطبيقات يستغرق من 2 إلى 6 أشهر.',
+            'تعتمد المدة على تعقيد التطبيق ومتطلبات المشروع ، لكن متوسط التطبيقات يستغرق من 2 إلى 6 أشهر.',
       ),
       Faq(
         question: 'هل تقدم دعمًا بعد التطوير؟',
-        answer: 'نعم، أقدم دعمًا فنيًا وصيانة لمدة 3-6 أشهر بعد إطلاق التطبيق.',
+        answer: 'نعم، أقدم دعمًا فنيًا وصيانة لمدة 1-2 أشهر بعد إطلاق التطبيق.',
       ),
       Faq(
-        question: 'هل يمكنني تخصيص تصميم التطبيق؟',
+        question: 'هل يمكنني تخصيص تصميم التطبيق ؟',
         answer: 'بالتأكيد! أعمل معك لتصميم واجهات مستخدم تلبي رؤيتك.',
       ),
     ];

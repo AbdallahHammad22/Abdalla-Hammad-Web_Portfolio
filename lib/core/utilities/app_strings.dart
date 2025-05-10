@@ -3,6 +3,9 @@ class AppStrings {
   //? Images .........................................................
   static const String profile = "assets/images/profile-pic.png";
   static const String hero = "assets/images/hero.jpg";
+  static const String dieayaicon = "assets/images/DIEAYA_ICON.png";
+  static const String tobtenicon = "assets/images/TOBTEN_ICON.png";
+  static const String arabicon = "assets/images/Arab_ICON.jpg";
   //? articl images ...................................................
   static const String articl_1 = "assets/images/articl_1.png";
   static const String articl_2 = "assets/images/articl_2.png";
