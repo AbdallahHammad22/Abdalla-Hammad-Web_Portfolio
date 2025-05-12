@@ -42,7 +42,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       drawer: _buildDrawer(context, isMobile),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          _launchUrl('https://wa.me/+201234567890'); // Replace with your WhatsApp link
+          _launchUrl(
+              'https://wa.me/+201234567890'); // Replace with your WhatsApp link
         },
         backgroundColor: Colors.teal,
         icon: const Icon(
@@ -510,61 +511,40 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         title: 'DIEAYA | دعاية',
         description: 'تطبيق تجارة إلكترونية لبيع مستلزمات الديكور والتصاميم.',
         image: AppStrings.dIEAYA_1,
-        url: 'https://github.com/yourusername/dieaya',
+        url: 'https://www.facebook.com/DevAbdallahHammad/',
       ),
       Project(
         title: 'Aldawa | الدواء',
-        description: 'تطبيق تابع لمجموعة صيدليات الدواء يمكنك من خلاله طلب الأدوية الطبية.',
+        description:
+            'تطبيق تابع لمجموعة صيدليات الدواء يمكنك من خلاله طلب الأدوية الطبية.',
         image: AppStrings.aldawa_1,
-        url: 'https://github.com/yourusername/aldawa',
+        url: 'https://www.facebook.com/DevAbdallahHammad/',
       ),
       Project(
         title: 'Osool | أصول',
-        description: 'تطبيق للعقارات حيث يمكنك شراء العقارات والتحدث للبائع من خلال التطبيق مباشرة.',
+        description:
+            'تطبيق للعقارات حيث يمكنك شراء العقارات والتحدث للبائع من خلال التطبيق مباشرة.',
         image: AppStrings.osool_1,
-        url: 'https://github.com/yourusername/osool',
+        url: 'https://www.facebook.com/DevAbdallahHammad/',
       ),
       Project(
         title: 'ELKHAYAL | الخيال',
         description: 'تطبيق الخيال للسياحة واستكشاف المملكة العربية السعودية.',
         image: AppStrings.eLKHAYAL_1,
-        url: 'https://github.com/yourusername/elkhayal',
+        url: 'https://www.facebook.com/DevAbdallahHammad/',
       ),
       Project(
         title: 'Admin Panel | لوحة التحكم',
-        description: 'لوحة تحكم مميزة تجمع بين الحداثة في المظهر والميزات الكثيرة.',
+        description:
+            'لوحة تحكم مميزة تجمع بين الحداثة في المظهر والميزات الكثيرة.',
         image: AppStrings.adminPanel,
-        url: 'https://github.com/yourusername/admin-panel',
+        url: 'https://www.facebook.com/DevAbdallahHammad/',
       ),
       Project(
-        title: 'LinguaLearn | تعلم اللغات',
-        description: 'تطبيق تعليمي لتعلم اللغات باستخدام دروس تفاعلية واختبارات.',
-        image: AppStrings.hero,
-        url: 'https://github.com/yourusername/lingualearn',
-      ),
-      Project(
-        title: 'FoodEase | إدارة المطاعم',
-        description: 'تطبيق لإدارة المطاعم يساعد في تلقي الطلبات وإدارة الحجوزات.',
-        image: AppStrings.hero,
-        url: 'https://github.com/yourusername/foodease',
-      ),
-      Project(
-        title: 'FitTrack | تتبع اللياقة',
-        description: 'تطبيق لتتبع اللياقة البدنية مع خطط تمارين وإحصائيات يومية.',
-        image: AppStrings.hero,
-        url: 'https://github.com/yourusername/fittrack',
-      ),
-      Project(
-        title: 'HotelBook | حجز الفنادق',
-        description: 'تطبيق لحجز الفنادق مع عروض خاصة وتكامل مع بوابات دفع.',
-        image: AppStrings.hero,
-        url: 'https://github.com/yourusername/hotelbook',
-      ),
-      Project(
-        title: 'StockMate | إدارة المخزون',
-        description: 'تطبيق لإدارة المخزون للشركات الصغيرة مع تقارير مفصلة.',
-        image: AppStrings.hero,
-        url: 'https://github.com/yourusername/stockmate',
+        title: 'Arab Sooq |السوق العربي',
+        description: 'تطبيق مخصص لبيع وشراء جميع المنتجات في  الاردن .',
+        image: AppStrings.sooq_1,
+        url: 'https://www.facebook.com/DevAbdallahHammad/',
       ),
     ];
 
@@ -871,23 +851,23 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     final stats = [
       Stat(
         icon: Icons.work,
-        value: '20+',
+        value: '14+',
         label: 'مشروع منفذ',
       ),
       Stat(
         icon: Icons.people,
-        value: '15+',
+        value: '9+',
         label: 'عميل راضٍ',
       ),
       Stat(
         icon: Icons.star,
-        value: '5',
+        value: '3',
         label: 'سنوات خبرة',
       ),
       Stat(
-        icon: Icons.download,
-        value: '50K+',
-        label: 'تنزيل للتطبيقات',
+        icon: Icons.location_on,
+        label: 'دول',
+        value: '5',
       ),
     ];
 
@@ -961,22 +941,26 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   // Testimonials Highlight Section
-  Widget _buildTestimonialsHighlightSection(BuildContext context, bool isMobile) {
+  Widget _buildTestimonialsHighlightSection(
+      BuildContext context, bool isMobile) {
     final testimonials = [
       Testimonial(
-        name: 'محمد علي',
-        comment: 'تطبيق رائع بأداء عالٍ وتصميم مميز!',
-        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+        name: 'دعاية | DIEAYA',
+        comment:
+            'تم تنفيذ تطبيق يلبي خدمات شركتي لتقديم خدمات التصميم من قبل المهندس عبدالله حماد والتيم التقني المتميز ',
+        image: AppStrings.dieayaicon,
       ),
       Testimonial(
-        name: 'سارة أحمد',
-        comment: 'سرعة التنفيذ والالتزام بالمواعيد مذهل!',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+        name: 'السوق العربي',
+        comment:
+            'تم تنفيذ تطبيق السوق العربي لتسهيل عمليه البيع والشراء الالكتروني داخل الاردن واتوجه له بالشكر على الاداء الرائع ',
+        image: AppStrings.arabicon,
       ),
       Testimonial(
-        name: 'أحمد خالد',
-        comment: 'تجربة مستخدم رائعة ودعم فني ممتاز!',
-        image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80',
+        name: 'توب تن',
+        comment:
+            'تم تلبية احتياج شركتي في انشاء تطبيق يعرض منتجات الشركه من ملابس ومستحضرات تجميل ويرجع الفضل للمهندس عبدالله والتيم التقني المميز',
+        image: AppStrings.tobtenicon,
       ),
     ];
 
@@ -1077,7 +1061,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             duration: const Duration(milliseconds: 300),
             child: ElevatedButton(
               onPressed: () {
-                _launchUrl('https://wa.me/+201234567890'); // Replace with your WhatsApp link
+                _launchUrl(
+                    'https://wa.me/+201234567890'); // Replace with your WhatsApp link
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.amber,
@@ -1316,7 +1301,8 @@ class _ProjectCardState extends State<_ProjectCard> {
                   onPressed: widget.onTap,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 24),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -1337,7 +1323,8 @@ class _ProjectCardState extends State<_ProjectCard> {
                       onPressed: widget.onTap,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey.shade700,
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 24),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

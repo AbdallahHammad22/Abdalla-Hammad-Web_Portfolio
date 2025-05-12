@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:my_web_app/core/utilities/app_strings.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class TestimonialsScreen extends StatefulWidget {
   const TestimonialsScreen({super.key});
@@ -25,9 +27,65 @@ class _TestimonialsScreenState extends State<TestimonialsScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController messageController = TextEditingController();
+
+  // استبدل هذه القيم بقيمك من EmailJS
+  final String serviceId = 'service_bh773hw'; // Service ID من EmailJS
+  final String templateId = 'template_71epizh'; // Template ID من EmailJS
+  final String userId = 'oHmpVvEjRJz4bf0ds'; // User ID من EmailJS
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  Future<void> _sendEmail() async {
+    if (nameController.text.isNotEmpty &&
+        emailController.text.isNotEmpty &&
+        messageController.text.isNotEmpty) {
+      if (!_isValidEmail(emailController.text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('يرجى إدخال بريد إلكتروني صحيح!')),
+        );
+        return;
+      }
+      final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'service_id': serviceId,
+          'template_id': templateId,
+          'user_id': userId,
+          'template_params': {
+            'from_name': nameController.text,
+            'from_email': emailController.text,
+            'reply_to': emailController.text,
+            'message': messageController.text,
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم إرسال الرسالة بنجاح!')),
+        );
+        nameController.clear();
+        emailController.clear();
+        messageController.clear();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'فشل في إرسال الرسالة: ${response.statusCode} - ${response.body}'),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى ملء جميع الحقول!')),
+      );
+    }
   }
 
   @override
@@ -504,22 +562,22 @@ class _TestimonialsScreenState extends State<TestimonialsScreen> {
   Widget _buildTestimonialsSection(BuildContext context, bool isMobile) {
     final testimonials = [
       Testimonial(
-        name: 'محمد علي',
-        comment: 'عبدالله قدم لي تطبيق موبايل رائع بأداء عالٍ وتصميم مميز!',
-        image:
-            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+        name: 'دعاية | DIEAYA',
+        comment:
+            'تم تنفيذ تطبيق يلبي خدمات شركتي لتقديم خدمات التصميم من قبل المهندس عبدالله حماد والتيم التقني المتميز ',
+        image: AppStrings.dieayaicon,
       ),
       Testimonial(
-        name: 'سارة أحمد',
-        comment: 'سرعة التنفيذ والالتزام بالمواعيد كانا مذهلين!',
-        image:
-            'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+        name: 'السوق العربي',
+        comment:
+            'تم تنفيذ تطبيق السوق العربي لتسهيل عمليه البيع والشراء الالكتروني داخل الاردن واتوجه له بالشكر على الاداء الرائع ',
+        image: AppStrings.arabicon,
       ),
       Testimonial(
-        name: 'خالد محمود',
-        comment: 'تعاملت مع عبدالله في مشروع تجارة إلكترونية، نتيجة مبهرة!',
-        image:
-            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+        name: 'توب تن',
+        comment:
+            'تم تلبية احتياج شركتي في انشاء تطبيق يعرض منتجات الشركه من ملابس ومستحضرات تجميل ويرجع الفضل للمهندس عبدالله والتيم التقني المميز',
+        image: AppStrings.tobtenicon,
       ),
     ];
 
@@ -877,10 +935,10 @@ class _TestimonialsScreenState extends State<TestimonialsScreen> {
   // Stats Section
   Widget _buildStatsSection(BuildContext context, bool isMobile) {
     final stats = [
-      Stat(label: 'مشاريع مكتملة', value: 5),
-      Stat(label: 'سنوات الخبرة', value: 2),
-      Stat(label: 'عملاء سعداء', value: 3),
-      Stat(label: 'دورات تدريبية', value: 3),
+      Stat(label: 'مشاريع مكتملة', value: 14),
+      Stat(label: 'سنوات الخبرة', value: 3),
+      Stat(label: 'عملاء سعداء', value: 9),
+      Stat(label: 'دورات تدريبية', value: 8),
     ];
 
     return Container(
@@ -1010,8 +1068,9 @@ class _TestimonialsScreenState extends State<TestimonialsScreen> {
           ),
           const SizedBox(height: 24),
           TextField(
+            controller: nameController,
             decoration: InputDecoration(
-              labelText: 'الاسم',
+              hintText: 'الاسم',
               filled: true,
               fillColor: Colors.white,
               border:
@@ -1021,8 +1080,9 @@ class _TestimonialsScreenState extends State<TestimonialsScreen> {
           ),
           const SizedBox(height: 16),
           TextField(
+            controller: emailController,
             decoration: InputDecoration(
-              labelText: 'البريد الإلكتروني',
+              hintText: 'البريد الإلكتروني',
               filled: true,
               fillColor: Colors.white,
               border:
@@ -1032,8 +1092,9 @@ class _TestimonialsScreenState extends State<TestimonialsScreen> {
           ),
           const SizedBox(height: 16),
           TextField(
+            controller: messageController,
             decoration: InputDecoration(
-              labelText: 'رسالتك',
+              hintText: 'رسالتك',
               filled: true,
               fillColor: Colors.white,
               border:
@@ -1044,7 +1105,17 @@ class _TestimonialsScreenState extends State<TestimonialsScreen> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () async {
+              if (nameController.text.isNotEmpty &&
+                  emailController.text.isNotEmpty &&
+                  messageController.text.isNotEmpty) {
+                await _sendEmail();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('يرجى ملء جميع الحقول!')),
+                );
+              }
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),

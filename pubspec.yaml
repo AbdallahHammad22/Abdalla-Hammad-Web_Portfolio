@@ -24,7 +24,8 @@ dependencies:
   flutter_staggered_grid_view: ^0.7.0
   percent_indicator: ^4.2.3
   url_launcher: ^6.3.0
-  http: ^1.3.0
+  http: ^1.2.0  # لإرسال طلبات HTTP
+  emailjs: ^4.0.0  # تأكد من آخر إصدار من pub.dev
   
 dev_dependencies:
   flutter_test:

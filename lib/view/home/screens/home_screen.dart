@@ -14,6 +14,8 @@ import 'package:my_web_app/core/utilities/app_strings.dart';
 import 'package:my_web_app/core/utilities/widget/main_button.dart';
 import 'package:my_web_app/core/utilities/widget/main_text.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,38 +35,65 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    //   // إظهار Pop-up ترحيبي بعد 3 ثوانٍ
-    //   Future.delayed(const Duration(seconds: 3), () {
-    //     showDialog(
-    //       context: context,
-    //       builder: (context) => AlertDialog(
-    //         title: const Text(
-    //           'هل لديك فكرة تطبيق؟',
-    //           textDirection: TextDirection.rtl,
-    //         ),
-    //         content: const Text(
-    //           'تواصل معي الآن لنحققها معًا!',
-    //           textDirection: TextDirection.rtl,
-    //         ),
-    //         actions: [
-    //           TextButton(
-    //             onPressed: () => Navigator.pop(context),
-    //             child: const Text('إغلاق'),
-    //           ),
-    //           ElevatedButton(
-    //             onPressed: () {
-    //               Navigator.pop(context);
-    //               Navigator.pushNamed(context, '/contact');
-    //             },
-    //             child: const Text('تواصل الآن'),
-    //           ),
-    //         ],
-    //       ),
-    //     );
-    //   });
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController messageController = TextEditingController();
+
+  // استبدل هذه القيم بقيمك من EmailJS
+  final String serviceId = 'service_bh773hw'; // Service ID من EmailJS
+  final String templateId = 'template_71epizh'; // Template ID من EmailJS
+  final String userId = 'oHmpVvEjRJz4bf0ds'; // User ID من EmailJS
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  Future<void> _sendEmail() async {
+    if (nameController.text.isNotEmpty &&
+        emailController.text.isNotEmpty &&
+        messageController.text.isNotEmpty) {
+      if (!_isValidEmail(emailController.text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('يرجى إدخال بريد إلكتروني صحيح!')),
+        );
+        return;
+      }
+      final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'service_id': serviceId,
+          'template_id': templateId,
+          'user_id': userId,
+          'template_params': {
+            'from_name': nameController.text,
+            'from_email': emailController.text,
+            'reply_to': emailController.text,
+            'message': messageController.text,
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم إرسال الرسالة بنجاح!')),
+        );
+        nameController.clear();
+        emailController.clear();
+        messageController.clear();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'فشل في إرسال الرسالة: ${response.statusCode} - ${response.body}'),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى ملء جميع الحقول!')),
+      );
+    }
   }
 
   @override
@@ -1009,7 +1038,8 @@ class _HomeScreenState extends State<HomeScreen> {
         title: 'DIEAYA | دعاية',
         description: 'تطبيق تجارة إلكترونية لبيع مستلزمات الديكور والتصاميم.',
         image: AppStrings.dIEAYA_1,
-        url: 'https://play.google.com/store/apps/details?id=com.digiplus.printing',
+        url:
+            'https://play.google.com/store/apps/details?id=com.digiplus.printing',
         category: 'Mobile',
       ),
       Project(
@@ -1564,8 +1594,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 24),
           TextField(
+            controller: nameController,
             decoration: InputDecoration(
-              labelText: 'الاسم',
+              hintText: 'الاسم',
               filled: true,
               fillColor: Colors.white,
               border:
@@ -1575,8 +1606,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 16),
           TextField(
+            controller: emailController,
             decoration: InputDecoration(
-              labelText: 'البريد الإلكتروني',
+              hintText: 'البريد الإلكتروني',
               filled: true,
               fillColor: Colors.white,
               border:
@@ -1586,8 +1618,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 16),
           TextField(
+            controller: messageController,
             decoration: InputDecoration(
-              labelText: 'رسالتك',
+              hintText: 'رسالتك',
               filled: true,
               fillColor: Colors.white,
               border:
@@ -1599,7 +1632,17 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 24),
           MainButton(
             color: AppColors.white,
-            onPressed: () {},
+            onPressed: () async {
+              if (nameController.text.isNotEmpty &&
+                  emailController.text.isNotEmpty &&
+                  messageController.text.isNotEmpty) {
+                await _sendEmail();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('يرجى ملء جميع الحقول!')),
+                );
+              }
+            },
             verticalPadding: 16,
             horizontalPadding: 32,
             child: const MainText.title(

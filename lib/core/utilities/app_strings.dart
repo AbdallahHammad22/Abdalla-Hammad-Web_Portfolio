@@ -17,6 +17,7 @@ class AppStrings {
   static const String osool_1 = "assets/images/Osool_1.png";
   static const String eLKHAYAL_1 = "assets/images/ELKHAYAL_1.png";
   static const String adminPanel = "assets/images/admin_panel.png";
+  static const String sooq_1 = "assets/images/Sooq_1.jpg";
 
   //? Icons ............................................................
   static const String linkedin = "assets/icon/linkedin.png";

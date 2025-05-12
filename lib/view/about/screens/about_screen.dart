@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:my_web_app/core/utilities/app_strings.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
 
@@ -25,9 +26,65 @@ class _AboutScreenState extends State<AboutScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController messageController = TextEditingController();
+
+  // استبدل هذه القيم بقيمك من EmailJS
+  final String serviceId = 'service_bh773hw'; // Service ID من EmailJS
+  final String templateId = 'template_71epizh'; // Template ID من EmailJS
+  final String userId = 'oHmpVvEjRJz4bf0ds'; // User ID من EmailJS
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  Future<void> _sendEmail() async {
+    if (nameController.text.isNotEmpty &&
+        emailController.text.isNotEmpty &&
+        messageController.text.isNotEmpty) {
+      if (!_isValidEmail(emailController.text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('يرجى إدخال بريد إلكتروني صحيح!')),
+        );
+        return;
+      }
+      final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'service_id': serviceId,
+          'template_id': templateId,
+          'user_id': userId,
+          'template_params': {
+            'from_name': nameController.text,
+            'from_email': emailController.text,
+            'reply_to': emailController.text,
+            'message': messageController.text,
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم إرسال الرسالة بنجاح!')),
+        );
+        nameController.clear();
+        emailController.clear();
+        messageController.clear();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'فشل في إرسال الرسالة: ${response.statusCode} - ${response.body}'),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى ملء جميع الحقول!')),
+      );
+    }
   }
 
   @override
@@ -508,12 +565,12 @@ class _AboutScreenState extends State<AboutScreen> {
       Experience(
         title: 'تقنية لتكنولوجيا المعلومات',
         description:
-            'أغسطس 2023 - أكتوبر 2023\n- تطوير مكونات واجهة مستخدم لتطبيق عقاري.\n- تحسين أداء التطبيق وإصلاح الأخطاء.',
+            'أغسطس 2023 - أكتوبر 2023\n- تطوير مكونات واجهة المستخدم لتطبيق عقاري.\n- تحسين أداء التطبيق وإصلاح الأخطاء وترقية الاصدار.',
         icon: Icons.work,
         tools: [
-          Tool(name: 'Flutter', icon: Icons.developer_mode),
+          Tool(name: 'Flutter', icon: Icons.flutter_dash),
           Tool(name: 'Ui Implementation', icon: Icons.design_services),
-          Tool(name: 'Problem Solving', icon: Icons.bug_report),
+          Tool(name: 'Problem Solving', icon: Icons.task),
         ],
       ),
       Experience(
@@ -522,9 +579,7 @@ class _AboutScreenState extends State<AboutScreen> {
             'يناير 2024 - الآن\n- دعاية : منصة تجارة إلكترونية لخدمات التصميم الرقمي\n- توب تن : تطبيق تابع لسلسلة براند توب تن داخل السعودية\n- الدواء : تطبيق لصيدليات الدواء النموذجية داخل السعودية\n- السوق العربي : سوق بيع وشراء الكتروني داخل الأردن\n- الخيال : تطبيق تجاري و استكشاف المملكة العربية السعودية ',
         icon: Icons.work,
         tools: [
-          Tool(name: 'Project Management', icon: Icons.manage_accounts),
-          Tool(name: 'Time Management', icon: Icons.timelapse),
-          Tool(name: 'Clickup', icon: Icons.ads_click),
+          Tool(name: 'Agile Project Management', icon: Icons.manage_accounts),
           Tool(name: 'Team Management', icon: Icons.people),
           Tool(name: 'Mobile Development', icon: Icons.mobile_friendly),
         ],
@@ -532,7 +587,7 @@ class _AboutScreenState extends State<AboutScreen> {
       Experience(
         title: 'Goaluin',
         description:
-            'يونيو 2023 - نوفمبر 2023\n- المساهمة في تطوير ت إدارة المطاعم.\n- تحسين قابلية التوسع وتحسين كود Flutter.',
+            'يونيو 2023 - نوفمبر 2023\n- المساهمة في تطوير تطبيق إدارة المطاعم.\n- تحسين قابلية التوسع والمساهمه في وضع اساس هيكل التطبيق.',
         icon: Icons.work,
         tools: [
           Tool(name: 'Flutter', icon: Icons.flutter_dash),
@@ -974,10 +1029,10 @@ class _AboutScreenState extends State<AboutScreen> {
   // Stats Section
   Widget _buildStatsSection(BuildContext context, bool isMobile) {
     final stats = [
-      Stat(label: 'مشاريع مكتملة', value: 18),
+      Stat(label: 'مشاريع مكتملة', value: 14),
       Stat(label: 'سنوات الخبرة', value: 3),
       Stat(label: 'دورات تدريبية', value: 8),
-      Stat(label: 'مهارات تقنية', value: 14),
+      Stat(label: 'مهارات تقنية', value: 23),
     ];
 
     return Container(
@@ -1052,22 +1107,22 @@ class _AboutScreenState extends State<AboutScreen> {
   Widget _buildTestimonialsSection(BuildContext context, bool isMobile) {
     final testimonials = [
       Testimonial(
-        name: 'محمد علي',
-        comment: 'عبدالله قدم لي تطبيق موبايل رائع بأداء عالٍ وتصميم مميز!',
-        image:
-            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+        name: 'دعاية | DIEAYA',
+        comment:
+            'تم تنفيذ تطبيق يلبي خدمات شركتي لتقديم خدمات التصميم من قبل المهندس عبدالله حماد والتيم التقني المتميز ',
+        image: AppStrings.dieayaicon,
       ),
       Testimonial(
-        name: 'سارة أحمد',
-        comment: 'سرعة التنفيذ والالتزام بالمواعيد كانا مذهلين!',
-        image:
-            'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+        name: 'السوق العربي',
+        comment:
+            'تم تنفيذ تطبيق السوق العربي لتسهيل عمليه البيع والشراء الالكتروني داخل الاردن واتوجه له بالشكر على الاداء الرائع ',
+        image: AppStrings.arabicon,
       ),
       Testimonial(
-        name: 'خالد محمود',
-        comment: 'تعاملت مع عبدالله في مشروع تجارة إلكترونية، نتيجة مبهرة!',
-        image:
-            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+        name: 'توب تن',
+        comment:
+            'تم تلبية احتياج شركتي في انشاء تطبيق يعرض منتجات الشركه من ملابس ومستحضرات تجميل ويرجع الفضل للمهندس عبدالله والتيم التقني المميز',
+        image: AppStrings.tobtenicon,
       ),
     ];
 
@@ -1182,8 +1237,9 @@ class _AboutScreenState extends State<AboutScreen> {
           ),
           const SizedBox(height: 24),
           TextField(
+            controller: nameController,
             decoration: InputDecoration(
-              labelText: 'الاسم',
+              hintText: 'الاسم',
               filled: true,
               fillColor: Colors.white,
               border:
@@ -1193,8 +1249,9 @@ class _AboutScreenState extends State<AboutScreen> {
           ),
           const SizedBox(height: 16),
           TextField(
+            controller: emailController,
             decoration: InputDecoration(
-              labelText: 'البريد الإلكتروني',
+              hintText: 'البريد الإلكتروني',
               filled: true,
               fillColor: Colors.white,
               border:
@@ -1204,8 +1261,9 @@ class _AboutScreenState extends State<AboutScreen> {
           ),
           const SizedBox(height: 16),
           TextField(
+            controller: messageController,
             decoration: InputDecoration(
-              labelText: 'رسالتك',
+              hintText: 'رسالتك',
               filled: true,
               fillColor: Colors.white,
               border:
@@ -1216,7 +1274,17 @@ class _AboutScreenState extends State<AboutScreen> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () async {
+              if (nameController.text.isNotEmpty &&
+                  emailController.text.isNotEmpty &&
+                  messageController.text.isNotEmpty) {
+                await _sendEmail();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('يرجى ملء جميع الحقول!')),
+                );
+              }
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),

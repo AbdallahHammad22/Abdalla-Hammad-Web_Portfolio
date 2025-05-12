@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:my_web_app/core/utilities/app_strings.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
@@ -14,9 +16,6 @@ class ContactScreen extends StatefulWidget {
 class _ContactScreenState extends State<ContactScreen> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController messageController = TextEditingController();
 
   Future<void> _launchUrl(String url) async {
     final Uri uri = Uri.parse(url);
@@ -25,9 +24,65 @@ class _ContactScreenState extends State<ContactScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController messageController = TextEditingController();
+
+  // استبدل هذه القيم بقيمك من EmailJS
+  final String serviceId = 'service_bh773hw'; // Service ID من EmailJS
+  final String templateId = 'template_71epizh'; // Template ID من EmailJS
+  final String userId = 'oHmpVvEjRJz4bf0ds'; // User ID من EmailJS
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  Future<void> _sendEmail() async {
+    if (nameController.text.isNotEmpty &&
+        emailController.text.isNotEmpty &&
+        messageController.text.isNotEmpty) {
+      if (!_isValidEmail(emailController.text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('يرجى إدخال بريد إلكتروني صحيح!')),
+        );
+        return;
+      }
+      final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'service_id': serviceId,
+          'template_id': templateId,
+          'user_id': userId,
+          'template_params': {
+            'from_name': nameController.text,
+            'from_email': emailController.text,
+            'reply_to': emailController.text,
+            'message': messageController.text,
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم إرسال الرسالة بنجاح!')),
+        );
+        nameController.clear();
+        emailController.clear();
+        messageController.clear();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'فشل في إرسال الرسالة: ${response.statusCode} - ${response.body}'),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى ملء جميع الحقول!')),
+      );
+    }
   }
 
   @override
@@ -42,7 +97,7 @@ class _ContactScreenState extends State<ContactScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           _launchUrl(
-              'https://wa.me/+01029576647'); // Replace with your WhatsApp link
+              'https://wa.me/01029576647'); // Replace with your WhatsApp link
         },
         backgroundColor: Colors.teal,
         icon: const Icon(
@@ -467,7 +522,7 @@ class _ContactScreenState extends State<ContactScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     _launchUrl(
-                        'https://wa.me/+01029576647'); // Replace with your WhatsApp link
+                        'https://wa.me/01029576647'); // Replace with your WhatsApp link
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber,
@@ -566,7 +621,7 @@ class _ContactScreenState extends State<ContactScreen> {
           TextField(
             controller: nameController,
             decoration: InputDecoration(
-              labelText: 'الاسم',
+              hintText: 'الاسم',
               filled: true,
               fillColor: Colors.grey.shade100,
               border: OutlineInputBorder(
@@ -579,7 +634,7 @@ class _ContactScreenState extends State<ContactScreen> {
           TextField(
             controller: emailController,
             decoration: InputDecoration(
-              labelText: 'البريد الإلكتروني',
+              hintText: 'البريد الإلكتروني',
               filled: true,
               fillColor: Colors.grey.shade100,
               border: OutlineInputBorder(
@@ -592,7 +647,7 @@ class _ContactScreenState extends State<ContactScreen> {
           TextField(
             controller: messageController,
             decoration: InputDecoration(
-              labelText: 'الرسالة',
+              hintText: 'الرسالة',
               filled: true,
               fillColor: Colors.grey.shade100,
               border: OutlineInputBorder(
@@ -604,9 +659,16 @@ class _ContactScreenState extends State<ContactScreen> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () {
-              _launchUrl(
-                  'mailto:your.email@example.com?subject=تواصل من الموقع&body=الاسم: ${nameController.text}%0Aالبريد: ${emailController.text}%0Aالرسالة: ${messageController.text}');
+            onPressed: () async {
+              if (nameController.text.isNotEmpty &&
+                  emailController.text.isNotEmpty &&
+                  messageController.text.isNotEmpty) {
+                await _sendEmail();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('يرجى ملء جميع الحقول!')),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.teal,
@@ -656,7 +718,7 @@ class _ContactScreenState extends State<ContactScreen> {
         icon: Icons.phone,
         title: 'رقم الهاتف',
         value: '201029576647+',
-        url: 'tel:+201029576647',
+        url: 'tel:01029576647',
       ),
       ContactInfo(
         icon: Icons.location_on,
